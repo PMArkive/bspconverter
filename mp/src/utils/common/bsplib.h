@@ -74,8 +74,7 @@ struct entity_t
 	portal_t	*m_pPortalsLeadingIntoAreas[2];	// portals leading into portalareas
 };
 
-extern	int				num_entities;
-extern	entity_t		entities[MAX_MAP_ENTITIES];
+extern	CUtlVector<entity_t> entities;
 
 extern	int			    nummodels;
 extern	dmodel_t	    dmodels[MAX_MAP_MODELS];
@@ -158,8 +157,7 @@ extern	unsigned short	dleafbrushes[MAX_MAP_LEAFBRUSHES];
 extern	int			    numsurfedges;
 extern	int			    dsurfedges[MAX_MAP_SURFEDGES];
 
-extern	int			    numareas;
-extern	darea_t		    dareas[MAX_MAP_AREAS];
+extern  CUtlVector<darea_t> dareas;
 
 extern	int			    numareaportals;
 extern	dareaportal_t	dareaportals[MAX_MAP_AREAPORTALS];
@@ -179,9 +177,8 @@ extern int				g_nClipPortalVerts;
 extern dcubemapsample_t	g_CubemapSamples[MAX_MAP_CUBEMAPSAMPLES];
 extern int				g_nCubemapSamples;
 
-extern int				g_nOverlayCount;
-extern doverlay_t		g_Overlays[MAX_MAP_OVERLAYS];
-extern doverlayfade_t	g_OverlayFades[MAX_MAP_OVERLAYS];	// Parallel array of fade info in a separate lump to avoid breaking backwards compat
+extern CUtlVector<doverlay_t> g_Overlays;
+extern CUtlVector<doverlayfade_t> g_OverlayFades; // Parallel array of fade info in a separate lump to avoid breaking backwards compat
 
 extern int				g_nWaterOverlayCount;
 extern dwateroverlay_t	g_WaterOverlays[MAX_MAP_WATEROVERLAYS];

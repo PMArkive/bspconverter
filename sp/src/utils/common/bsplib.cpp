@@ -650,8 +650,7 @@ dbrush_t	dbrushes[MAX_MAP_BRUSHES];
 int			numbrushsides;
 dbrushside_t	dbrushsides[MAX_MAP_BRUSHSIDES];
 
-int			numareas;
-darea_t		dareas[MAX_MAP_AREAS];
+CUtlVector<darea_t> dareas;
 
 int			numareaportals;
 dareaportal_t	dareaportals[MAX_MAP_AREAPORTALS];
@@ -676,9 +675,8 @@ int					g_nClipPortalVerts;
 dcubemapsample_t	g_CubemapSamples[MAX_MAP_CUBEMAPSAMPLES];
 int					g_nCubemapSamples = 0;
 
-int					g_nOverlayCount;
-doverlay_t			g_Overlays[MAX_MAP_OVERLAYS];
-doverlayfade_t		g_OverlayFades[MAX_MAP_OVERLAYS];
+CUtlVector<doverlay_t> g_Overlays;
+CUtlVector<doverlayfade_t> g_OverlayFades;
 
 int					g_nWaterOverlayCount;
 dwateroverlay_t		g_WaterOverlays[MAX_MAP_WATEROVERLAYS];
@@ -2727,7 +2725,7 @@ void LoadBSPFile( const char *filename )
 		for ( int i = 0; i < numbrushsides; i++ )
 			dbrushsides[i].bevel = (byte)dbrushsides[i].bevel; // L4D2/ASW and above divide dbrushside_t::bevel into bevel and thin, each one byte
 	}
-	numareas = CopyLump( LUMP_AREAS, dareas );
+	CopyLump( LUMP_AREAS, dareas );
 	numareaportals = CopyLump( LUMP_AREAPORTALS, dareaportals );
 
 	visdatasize = CopyLump ( FIELD_CHARACTER, LUMP_VISIBILITY, dvisdata );
@@ -2777,7 +2775,7 @@ void LoadBSPFile( const char *filename )
 	CopyLump( FIELD_CHARACTER, LUMP_TEXDATA_STRING_DATA, g_TexDataStringData );
 	CopyLump( FIELD_INTEGER, LUMP_TEXDATA_STRING_TABLE, g_TexDataStringTable );
 
-	g_nOverlayCount = CopyLump( LUMP_OVERLAYS, g_Overlays );
+	CopyLump( LUMP_OVERLAYS, g_Overlays );
 	g_nWaterOverlayCount = CopyLump( LUMP_WATEROVERLAYS, g_WaterOverlays );
 	CopyLump( LUMP_OVERLAY_FADES, g_OverlayFades );
 	
@@ -2965,6 +2963,7 @@ void UnloadBSPFile()
 	numedges = 0;
 	numbrushes = 0;
 	numbrushsides = 0;
+	dareas.Purge();
 	numareaportals = 0;
 
 	visdatasize = 0;
@@ -3005,6 +3004,8 @@ void UnloadBSPFile()
 	g_TexDataStringData.Purge();
 	g_TexDataStringTable.Purge();
 
+	g_Overlays.Purge();
+	g_OverlayFades.Purge();
 	g_nWaterOverlayCount = 0;
 
 	g_LevelFlags = 0;
@@ -3224,9 +3225,9 @@ void SanityCheckBSPFile()
 	}
 
 	// these are the only constants that appear to have changed...
-	if ( num_entities > MAX_MAP_ENTITIES )
+	if ( entities.Count() > MAX_MAP_ENTITIES )
 	{
-		Error( "Map has too many entities (has %d, can have at most %d)\n", num_entities, MAX_MAP_ENTITIES );
+		Error( "Map has too many entities (has %d, can have at most %d)\n", entities.Count(), MAX_MAP_ENTITIES );
 		return;
 	}
 	if ( g_dispinfo.Count() > MAX_MAP_DISPINFO )
@@ -3234,14 +3235,14 @@ void SanityCheckBSPFile()
 		Error( "Map has too many dispinfos (has %d, can have at most %d)\n", g_dispinfo.Count(), MAX_MAP_DISPINFO );
 		return;
 	}
-	if ( numareas > MAX_MAP_AREAS )
+	if ( dareas.Count() > MAX_MAP_AREAS )
 	{
-		Error( "Map has too many areas (has %d, can have at most %d)\n", numareas, MAX_MAP_AREAS );
+		Error( "Map has too many areas (has %d, can have at most %d)\n", dareas.Count(), MAX_MAP_AREAS );
 		return;
 	}
-	if ( g_nOverlayCount > MAX_MAP_OVERLAYS )
+	if ( g_Overlays.Count() > MAX_MAP_OVERLAYS )
 	{
-		Error( "Map has too many overlays (has %d, can have at most %d)\n", g_nOverlayCount, MAX_MAP_OVERLAYS );
+		Error( "Map has too many overlays (has %d, can have at most %d)\n", g_Overlays.Count(), MAX_MAP_OVERLAYS );
 		return;
 	}
 }
@@ -3302,7 +3303,7 @@ void WriteBSPFile( const char *filename, char *pUnused )
 	AddLump( LUMP_SURFEDGES, dsurfedges, numsurfedges );
 	AddLump( LUMP_EDGES, dedges, numedges );
 	AddLump( LUMP_MODELS, dmodels, nummodels );
-	AddLump( LUMP_AREAS, dareas, numareas );
+	AddLump( LUMP_AREAS, dareas );
 	AddLump( LUMP_AREAPORTALS, dareaportals, numareaportals );
 
 	AddLump( LUMP_LIGHTING, dlightdataLDR, LUMP_LIGHTING_VERSION );
@@ -3332,9 +3333,9 @@ void WriteBSPFile( const char *filename, char *pUnused )
 	AddLump( LUMP_CUBEMAPS, g_CubemapSamples, g_nCubemapSamples );
 	AddLump( LUMP_TEXDATA_STRING_DATA, g_TexDataStringData );
 	AddLump( LUMP_TEXDATA_STRING_TABLE, g_TexDataStringTable );
-	AddLump( LUMP_OVERLAYS, g_Overlays, g_nOverlayCount );
+	AddLump( LUMP_OVERLAYS, g_Overlays );
 	AddLump( LUMP_WATEROVERLAYS, g_WaterOverlays, g_nWaterOverlayCount );
-	AddLump( LUMP_OVERLAY_FADES, g_OverlayFades, g_nOverlayCount );
+	AddLump( LUMP_OVERLAY_FADES, g_OverlayFades );
 
 	if ( g_pPhysCollide )
 	{
@@ -3502,7 +3503,7 @@ void PrintBSPFileSizes (void)
 {
 	int	totalmemory = 0;
 
-//	if (!num_entities)
+//	if (!entities.Count())
 //		ParseEntities ();
 
 	Msg("\n");
@@ -3529,7 +3530,7 @@ void PrintBSPFileSizes (void)
 	totalmemory += ArrayUsage( "leaves",		numleafs,		ENTRIES(dleafs),		ENTRYSIZE(dleafs) );
 	totalmemory += ArrayUsage( "leaffaces",		numleaffaces,	ENTRIES(dleaffaces),	ENTRYSIZE(dleaffaces) );
 	totalmemory += ArrayUsage( "leafbrushes",	numleafbrushes,	ENTRIES(dleafbrushes),	ENTRYSIZE(dleafbrushes) );
-	totalmemory += ArrayUsage( "areas",	numareas,	ENTRIES(dareas),	ENTRYSIZE(dareas) );
+	totalmemory += ArrayUsage( "areas",         dareas.Count(), MAX_MAP_AREAS,          sizeof( darea_t ) );
 	totalmemory += ArrayUsage( "surfedges",		numsurfedges,	ENTRIES(dsurfedges),	ENTRYSIZE(dsurfedges) );
 	totalmemory += ArrayUsage( "edges",			numedges,		ENTRIES(dedges),		ENTRYSIZE(dedges) );
 	totalmemory += ArrayUsage( "LDR worldlights",	numworldlightsLDR,	ENTRIES(dworldlightsLDR),	ENTRYSIZE(dworldlightsLDR) );
@@ -3540,7 +3541,7 @@ void PrintBSPFileSizes (void)
 	totalmemory += ArrayUsage( "waterverts",	g_numprimverts,	ENTRIES(g_primverts),	ENTRYSIZE(g_primverts) );
 	totalmemory += ArrayUsage( "waterindices",	g_numprimindices,ENTRIES(g_primindices),ENTRYSIZE(g_primindices) );
 	totalmemory += ArrayUsage( "cubemapsamples", g_nCubemapSamples,ENTRIES(g_CubemapSamples),ENTRYSIZE(g_CubemapSamples) );
-	totalmemory += ArrayUsage( "overlays",      g_nOverlayCount, ENTRIES(g_Overlays),   ENTRYSIZE(g_Overlays) );
+	totalmemory += ArrayUsage( "overlays",      g_Overlays.Count(), MAX_MAP_OVERLAYS, sizeof( doverlay_t ) );
 	
 	totalmemory += GlobUsage( "LDR lightdata",		dlightdataLDR.Count(),	0 );
 	totalmemory += GlobUsage( "HDR lightdata",	dlightdataHDR.Count(),	0 );
@@ -3606,8 +3607,7 @@ void PrintBSPPackDirectory( void )
 
 //============================================
 
-int			num_entities;
-entity_t	entities[MAX_MAP_ENTITIES];
+CUtlVector<entity_t> entities;
 
 void StripTrailing (char *e)
 {
@@ -3666,11 +3666,10 @@ qboolean	ParseEntity (void)
 	if (Q_stricmp (token, "{") )
 		Error ("ParseEntity: { not found");
 	
-	if (num_entities == MAX_MAP_ENTITIES)
+	if ( entities.Count() == MAX_MAP_ENTITIES )
 		Error ("num_entities == MAX_MAP_ENTITIES");
 
-	mapent = &entities[num_entities];
-	num_entities++;
+	mapent = &entities[entities.AddToTail()];
 
 	do
 	{
@@ -3695,7 +3694,8 @@ Parses the dentdata string into entities
 */
 void ParseEntities (void)
 {
-	num_entities = 0;
+	entities.Purge();
+	entities.EnsureCapacity( MAX_MAP_ENTITIES );
 	ParseFromMemory (dentdata.Base(), dentdata.Count());
 
 	while (ParseEntity ())
@@ -3721,7 +3721,7 @@ void UnparseEntities (void)
 	CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
 	buffer.EnsureCapacity( 256 * 1024 );
 	
-	for (i=0 ; i<num_entities ; i++)
+	for (i=0 ; i<entities.Count() ; i++)
 	{
 		ep = entities[i].epairs;
 		if (!ep)
