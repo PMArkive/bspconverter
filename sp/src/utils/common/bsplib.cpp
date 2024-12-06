@@ -1366,6 +1366,14 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_flForcedFadeScale = vecProps[j].m_flForcedFadeScale;
 									vecFixedProps[j].m_nMinDXLevel = vecProps[j].m_nMinDXLevel;
 									vecFixedProps[j].m_nMaxDXLevel = vecProps[j].m_nMaxDXLevel;
+
+									// spew props that will look differently
+									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
+									{
+										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
+												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
+									}
 								}
 
 								break;
@@ -1393,6 +1401,14 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_flForcedFadeScale = vecProps[j].m_flForcedFadeScale;
 									vecFixedProps[j].m_nMinDXLevel = 0;
 									vecFixedProps[j].m_nMaxDXLevel = 0;
+
+									// spew props that will look differently
+									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
+									{
+										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
+												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
+									}
 								}
 
 								break;
@@ -1420,6 +1436,14 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_flForcedFadeScale = vecProps[j].m_flForcedFadeScale;
 									vecFixedProps[j].m_nMinDXLevel = 0;
 									vecFixedProps[j].m_nMaxDXLevel = 0;
+
+									// spew props that will look differently
+									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
+									{
+										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
+												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
+									}
 								}
 
 								break;
@@ -1447,6 +1471,14 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_flForcedFadeScale = vecProps[j].m_flForcedFadeScale;
 									vecFixedProps[j].m_nMinDXLevel = 0;
 									vecFixedProps[j].m_nMaxDXLevel = 0;
+
+									// spew props that will look differently
+									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
+									{
+										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
+												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
+									}
 								}
 
 								break;
@@ -1474,6 +1506,20 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_flForcedFadeScale = vecProps[j].m_flForcedFadeScale;
 									vecFixedProps[j].m_nMinDXLevel = 0;
 									vecFixedProps[j].m_nMaxDXLevel = 0;
+
+									// spew props that will look differently
+									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
+									{
+										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
+												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
+									}
+									if ( vecProps[j].m_flUniformScale != 1.0f )
+									{
+										Warning( "Static prop at %.2f %.2f %.2f has non-default scale (%.2f)!\n",
+												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
+												 vecProps[j].m_flUniformScale );
+									}
 								}
 
 								break;
