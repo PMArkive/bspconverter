@@ -274,6 +274,7 @@ int main(int argc, char* argv[])
 							bDoFixup = V_strstr( szRelativeFileName, "_wvt_patch.vmt" ) != NULL;
 
 							// if not, load the vmt and see if it's a patch vmt that replaces $envmap
+							// or an insert vmt that adds $waterdepth
 							if ( !bDoFixup )
 							{
 								bufFile.SetBufferType( true, true );
@@ -284,29 +285,57 @@ int main(int argc, char* argv[])
 									KeyValues* pkvMaterialReplaceBlock = pkvMaterial->FindKey( "replace" );
 									if ( pkvMaterialReplaceBlock )
 									{
-										const char* pszEnvmapName = pkvMaterialReplaceBlock->GetString( "$envmap", NULL );
-										if ( pszEnvmapName )
+										// $envmap might live in "replace" itself, or in a subkey, need to account for both
+										auto ReplaceEnvmap = [iMaterialsFolderLength]( KeyValues* pkvMaterialBlock )
 										{
-											// this envmap does indeed live inside a map-named subfolder, fix it!
-											// -10 to disregard 'materials/' in front
-											char szFixedEnvmapPath[MAX_PATH];
-											V_snprintf( szFixedEnvmapPath, sizeof( szFixedEnvmapPath ), "maps/%s/%s", g_szOutputFile, &pszEnvmapName[iMaterialsFolderLength - 10] );
-											pkvMaterialReplaceBlock->SetString( "$envmap", szFixedEnvmapPath );
-
-											// PiMoN: unfortunately, KV doesn't have any way to save itself to a buffer, so I will have to commit an insane hack:
-											// save KV to a temp file first, then load that file to buffer and hope it doesn't shit itself :facepalm:
-											if ( pkvMaterial->SaveToFile( g_pFileSystem, "bspconverter_temp.txt", "GAME" ) )
+											if ( pkvMaterialBlock )
 											{
-												bufFile.Clear(); // if I don't clear the buffer, it will crash when trying to grow existing buffer...
-												if ( g_pFileSystem->ReadFile( "bspconverter_temp.txt", "GAME", bufFile ) )
+												const char* pszEnvmapName = pkvMaterialBlock->GetString( "$envmap", NULL );
+												if ( pszEnvmapName )
 												{
-													g_pFullFileSystem->RemoveFile( "bspconverter_temp.txt", "GAME" );
+													// this envmap does indeed live inside a map-named subfolder, fix it!
+													// -10 to disregard 'materials/' in front
+													char szFixedEnvmapPath[MAX_PATH];
+													V_snprintf( szFixedEnvmapPath, sizeof( szFixedEnvmapPath ), "maps/%s/%s", g_szOutputFile, &pszEnvmapName[iMaterialsFolderLength - 10] );
+													pkvMaterialBlock->SetString( "$envmap", szFixedEnvmapPath );
 													qprintf( "Fixed embedded material cubemap patch: '%s'\n", szFixedEnvmapPath );
+
+													return true;
 												}
 											}
 
-											bDoFixup = true;
+											return false;
+										};
+
+										bDoFixup |= ReplaceEnvmap( pkvMaterialReplaceBlock );
+										if ( pkvMaterialReplaceBlock )
+										{
+											FOR_EACH_TRUE_SUBKEY( pkvMaterialReplaceBlock, pkvMaterialBlock )
+												bDoFixup |= ReplaceEnvmap( pkvMaterialBlock );
 										}
+									}
+
+									// save whatever edited the material above
+									if ( bDoFixup )
+									{
+										// PiMoN: unfortunately, KV doesn't have any way to save itself to a buffer, so I will have to commit an insane hack:
+										// save KV to a temp file first, then load that file to buffer and hope it doesn't shit itself :facepalm:
+										if ( pkvMaterial->SaveToFile( g_pFileSystem, "bspconverter_temp.txt", "GAME" ) )
+										{
+											bufFile.Clear(); // if I don't clear the buffer, it will crash when trying to grow existing buffer...
+											if ( g_pFileSystem->ReadFile( "bspconverter_temp.txt", "GAME", bufFile ) )
+												g_pFullFileSystem->RemoveFile( "bspconverter_temp.txt", "GAME" );
+										}
+									}
+
+									// now do things that don't require re-saving the material
+									KeyValues* pkvMaterialInsertBlock = pkvMaterial->FindKey( "insert" );
+									if ( pkvMaterialInsertBlock )
+									{
+										// vbsp inserts $waterdepth into water materials, they need to be fixed as they also live in a map-named subfolder
+										const char* pszWaterDepth = pkvMaterialInsertBlock->GetString( "$waterdepth", NULL );
+										if ( pszWaterDepth )
+											bDoFixup |= true;
 									}
 								}
 							}
