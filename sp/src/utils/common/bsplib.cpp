@@ -1368,7 +1368,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									// spew props that will look differently
 									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
 									{
-										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+										Warning( "static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
 												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
 												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
 									}
@@ -1403,7 +1403,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									// spew props that will look differently
 									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
 									{
-										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+										Warning( "static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
 												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
 												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
 									}
@@ -1438,7 +1438,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									// spew props that will look differently
 									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
 									{
-										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+										Warning( "static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
 												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
 												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
 									}
@@ -1473,7 +1473,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									// spew props that will look differently
 									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
 									{
-										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+										Warning( "static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
 												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
 												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
 									}
@@ -1508,13 +1508,13 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									// spew props that will look differently
 									if ( vecProps[j].m_DiffuseModulation.r != 255 || vecProps[j].m_DiffuseModulation.g != 255 || vecProps[j].m_DiffuseModulation.b != 255 )
 									{
-										Warning( "Static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
+										Warning( "static prop at %.2f %.2f %.2f has non-default render color (%d %d %d)!\n",
 												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
 												 vecProps[j].m_DiffuseModulation.r, vecProps[j].m_DiffuseModulation.g, vecProps[j].m_DiffuseModulation.b );
 									}
 									if ( vecProps[j].m_flUniformScale != 1.0f )
 									{
-										Warning( "Static prop at %.2f %.2f %.2f has non-default scale (%.2f)!\n",
+										Warning( "static prop at %.2f %.2f %.2f has non-default scale (%.2f)!\n",
 												 vecProps[j].m_Origin.x, vecProps[j].m_Origin.y, vecProps[j].m_Origin.z,
 												 vecProps[j].m_flUniformScale );
 									}
@@ -2684,7 +2684,7 @@ void LoadBSPFile( const char *filename )
 			// SP doesn't support compressed lumps, unlike any other branch...
 			int iUncompressedSize = *(int*)&g_pBSPHeader->lumps[i].fourCC;
 			if ( iUncompressedSize > 0 )
-				Error( "Compressed lump %d, not supported", i );
+				Error( "compressed lump %d, not supported", i );
 		}
 	}
 
@@ -2800,19 +2800,19 @@ void LoadBSPFile( const char *filename )
 		if ( g_BSPConverterOptions.m_bSaveLightData )
 		{
 			if ( dlightdataLDR.IsEmpty() && dlightdataHDR.IsEmpty() )
-				Warning( "Map has no lighting\n" );
+				Warning( "map has no lighting\n" );
 			else if ( dlightdataLDR.IsEmpty() )
-				Warning( "Map has HDR lighting only\n" );
+				Warning( "map has HDR lighting only\n" );
 			else if ( dlightdataHDR.IsEmpty() )
-				Warning( "Map has LDR lighting only\n" );
+				Warning( "map has LDR lighting only\n" );
 			else
-				qprintf( "Map has HDR and LDR lighting\n" );
+				qprintf( "map has HDR and LDR lighting\n" );
 
 			if ( flags_lump.m_LevelFlags & 0x00000004 ) // lightmap alpha
 			{
 				if ( g_BSPConverterOptions.m_bSaveLightmapAlpha )
 				{
-					Warning( "Lightmap alpha is present; this is not a problem, but the map size will be bloated with useless data!\n" );
+					Warning( "lightmap alpha is present; this is not a problem, but the map size will be bloated with useless data!\n" );
 				}
 				else
 				{
@@ -2899,6 +2899,28 @@ void LoadBSPFile( const char *filename )
 	{
 		GetPakFile()->ActivateByteSwapping( IsX360() );
 		GetPakFile()->ParseFromBuffer( pakbuffer, paksize );
+
+		if ( g_BSPConverterOptions.m_bEnabled && !g_BSPConverterOptions.m_bSaveLightData )
+		{
+			// strip static prop light data if we don't save light data
+			Msg( "stripping static prop light data\n" );
+
+			int iID = -1;
+			while ( 1 )
+			{
+				int iFileSize;
+				char szRelativeFileName[MAX_PATH];
+				iID = GetNextFilename( GetPakFile(), iID, szRelativeFileName, sizeof( szRelativeFileName ), iFileSize );
+				if ( iID == -1 )
+					break;
+
+				if ( !V_stricmp( V_GetFileExtension( szRelativeFileName ), "vhv" ) )
+				{
+					RemoveFileFromPak( GetPakFile(), szRelativeFileName );
+					iID = -1; // reset our iteration, otherwise the loop will skip a bunch of files
+				}
+			}
+		}
 	}
 	else
 	{
