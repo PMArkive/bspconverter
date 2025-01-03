@@ -20,8 +20,9 @@
 #include "utlbuffer.h"
 #include "KeyValues.h"
 
-bool g_bSpewMissingAssets = false;
-char g_szOutputFile[MAX_PATH] = { 0 };
+static bool g_bSpewMissingAssets = false;
+static char g_szOutputFile[MAX_PATH] = { 0 };
+static bool g_bRemoveCustomAssets = false;
 int ParseCommandLine( int argc, char** argv )
 {
 	int i;
@@ -38,6 +39,10 @@ int ParseCommandLine( int argc, char** argv )
 		else if ( !V_stricmp( argv[i], "-spewmissingassets" ) )
 		{
 			g_bSpewMissingAssets = true;
+		}
+		else if ( !V_stricmp( argv[i], "-removecustomassets" ) )
+		{
+			g_bRemoveCustomAssets = true;
 		}
 		else if ( !V_stricmp( argv[i], "-o" ) || !V_stricmp( argv[i], "-output" ) )
 		{
@@ -97,11 +102,12 @@ void PrintUsage( int argc, char** argv )
 		"\n"
 		"Common options:\n"
 		"\n"
-		"  -o (or -output)    : Specifies output file name, defaults to <mapname>_fixed.bsp\n"
-		"  -nolightdata       : Doesn't save any light information in the fixed file\n"
-		"  -keeplightmapalpha : Doesn't strip unused lightmap alpha data\n"
-		"  -spewmissingassets : Logs every missing brush material and static prop model\n"
-		"  -v (or -verbose)   : Turn on verbose output\n"
+		"  -o (or -output)     : Specifies output file name, defaults to <mapname>_fixed.bsp\n"
+		"  -nolightdata        : Doesn't save any light information in the fixed file\n"
+		"  -keeplightmapalpha  : Doesn't strip unused lightmap alpha data\n"
+		"  -spewmissingassets  : Logs every missing brush material and static prop model\n"
+		"  -removecustomassets : Removes all embedded files except VBSP-generated ones (cubemaps, .vmt patches)\n"
+		"  -v (or -verbose)    : Turn on verbose output\n"
 		"\n"
 	);
 }
@@ -201,21 +207,22 @@ int main(int argc, char* argv[])
 				// no idea if this is necessary, but not a bad practice to make sure slashes are the same!
 				V_FixSlashes( szRelativeFileName, '/' );
 
+				// have to copy extension to a temp buffer, because path fixup below will make pointer invalid
+				char szExtension[16] = { 0 };
+				V_strcpy_safe( szExtension, V_GetFileExtension( szRelativeFileName ) );
+
 				// oh boy...
+				bool bDoFixup = false;
 				if ( !V_strncasecmp( szMaterialsFolder, szRelativeFileName, iMaterialsFolderLength ) )
 				{
 					// this file does indeed live inside a map-named subfolder, fix it!
 					// but first check extension to filter out unwanted files =)
-					// have to copy extension to a temp buffer, because path fixup below will make pointer invalid
-					char szExtension[16] = { 0 };
-					V_strcpy_safe( szExtension, V_GetFileExtension( szRelativeFileName ) );
 					if ( szExtension[0] )
 					{
 						// do path fixup for cubemaps
 						if ( !V_strcmp( szExtension, "vtf" ) )
 						{
-							// check if this is actually a cubemap
-							bool bDoFixup = false;
+							// check if this is a map-placed cubemap
 
 							// first check if it's a default cubemap
 							char szCubemapSamplePath[MAX_PATH];
@@ -266,8 +273,7 @@ int main(int argc, char* argv[])
 						// (wvt patches and envmap patches to replace 'env_cubemap' with full path to cubemap file)
 						if ( !V_strcmp( szExtension, "vmt" ) )
 						{
-							// check if this is actually a vbsp-generated vmt
-							bool bDoFixup = false;
+							// check if this is a vbsp-generated vmt
 
 							// first check if it's a wvt patch
 							bDoFixup = V_strstr( szRelativeFileName, "_wvt_patch.vmt" ) != NULL;
@@ -366,7 +372,11 @@ int main(int argc, char* argv[])
 					}
 				}
 
-				AddBufferToPak( pNewPakFile, szRelativeFileName, bufFile.Base(), bufFile.TellMaxPut(), false, IZip::eCompressionType_None );
+				// if this file didn't require fixing up and it's not a static prop lighting file, it must be a custom asset, don't write it unless we keep them
+				if ( bDoFixup || !V_stricmp( szExtension, "vhv" ) || !g_bRemoveCustomAssets )
+					AddBufferToPak( pNewPakFile, szRelativeFileName, bufFile.Base(), bufFile.TellMaxPut(), false, IZip::eCompressionType_None );
+				else
+					qprintf( "Skipping custom content file '%s'\n", szRelativeFileName );
 			}
 
 			// discard old pak in favor of new pak

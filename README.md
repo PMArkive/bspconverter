@@ -18,6 +18,7 @@ Options:
 -nolightdata          : Doesn't save any light information in the fixed file
 -keeplightmapalpha    : Doesn't strip unused lightmap alpha data
 -spewmissingassets    : Logs every missing brush material and static prop model
+-removecustomassets   : Removes all embedded files except VBSP-generated ones (cubemaps, .vmt patches)
 -v (or -verbose)      : Turn on verbose output
 
 -vproject <directory> : Override the VPROJECT environment variable
