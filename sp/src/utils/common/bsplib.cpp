@@ -1462,6 +1462,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_Solid = vecProps[j].m_Solid;
 									vecFixedProps[j].m_Flags = vecProps[j].m_Flags;
 									vecFixedProps[j].m_Flags &= ~STATIC_PROP_SCREEN_SPACE_FADE; // 0x20 is STATIC_PROP_MARKED_FOR_FAST_REFLECTION, unused
+									vecFixedProps[j].m_Flags &= ~STATIC_PROP_NO_PER_VERTEX_LIGHTING; // this flag is re-purposed by vrad as "no occlusion"
 									vecFixedProps[j].m_Skin = vecProps[j].m_Skin;
 									vecFixedProps[j].m_FadeMinDist = vecProps[j].m_FadeMinDist;
 									vecFixedProps[j].m_FadeMaxDist = vecProps[j].m_FadeMaxDist;
@@ -1497,6 +1498,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_Solid = vecProps[j].m_Solid;
 									vecFixedProps[j].m_Flags = vecProps[j].m_Flags;
 									vecFixedProps[j].m_Flags &= ~STATIC_PROP_SCREEN_SPACE_FADE; // 0x20 is STATIC_PROP_MARKED_FOR_FAST_REFLECTION, unused
+									vecFixedProps[j].m_Flags &= ~STATIC_PROP_NO_PER_VERTEX_LIGHTING; // this flag is re-purposed by vrad as "no occlusion"
 									vecFixedProps[j].m_Skin = vecProps[j].m_Skin;
 									vecFixedProps[j].m_FadeMinDist = vecProps[j].m_FadeMinDist;
 									vecFixedProps[j].m_FadeMaxDist = vecProps[j].m_FadeMaxDist;

@@ -1535,6 +1535,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_nMaxDXLevel = 0;
 									vecFixedProps[j].m_Flags = vecProps[j].m_Flags | STATIC_PROP_NO_PER_TEXEL_LIGHTING;
 									vecFixedProps[j].m_Flags &= ~STATIC_PROP_SCREEN_SPACE_FADE; // 0x20 is STATIC_PROP_MARKED_FOR_FAST_REFLECTION, unused
+									vecFixedProps[j].m_Flags &= ~STATIC_PROP_NO_PER_VERTEX_LIGHTING; // this flag is re-purposed by vrad as "no occlusion"
 									vecFixedProps[j].m_nLightmapResolutionX = 0;
 									vecFixedProps[j].m_nLightmapResolutionY = 0;
 
@@ -1572,6 +1573,7 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 									vecFixedProps[j].m_nMaxDXLevel = 0;
 									vecFixedProps[j].m_Flags = vecProps[j].m_Flags | STATIC_PROP_NO_PER_TEXEL_LIGHTING;
 									vecFixedProps[j].m_Flags &= ~STATIC_PROP_SCREEN_SPACE_FADE; // 0x20 is STATIC_PROP_MARKED_FOR_FAST_REFLECTION, unused
+									vecFixedProps[j].m_Flags &= ~STATIC_PROP_NO_PER_VERTEX_LIGHTING; // this flag is re-purposed by vrad as "no occlusion"
 									vecFixedProps[j].m_nLightmapResolutionX = 0;
 									vecFixedProps[j].m_nLightmapResolutionY = 0;
 
